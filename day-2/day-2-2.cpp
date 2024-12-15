@@ -34,27 +34,37 @@ vector<vector<int>> loadReports(const string inputFilePath) {
     return newReport;
 }
 
+
+// Should be 'getEvaluator()'
+
+std::function<bool(int leftLevel, int rightLevel)> getEvaluator(const vector<int> report) {
+    
+}
+
 bool checkReport(const vector<int> &report) {
     if (report[0] == report[1]) {
         return false;
     }
-
-    std::function<bool(int a, int b)> evaluator;
+    // Going to build an evaluation function as a lamda, starting with which
+    // comparison to use.
+    std::function<bool(int leftLevel, int rightLevel)> levelComparison;
     if (report[0] < report[1]) {
-        evaluator = [](int a, int b) {
-            int difference = abs(a - b);
-            return (difference > 0 && difference <= 3) && a < b; 
-        };
+        levelComparison = [](int leftLevel, int rightLevel) { return leftLevel < rightLevel; }; 
     } else {
-        evaluator = [](int a, int b) { 
-            int difference = abs(a - b);
-            return (difference > 0 && difference <= 3) && a > b; 
-        };
+        levelComparison = [](int leftLevel, int rightLevel) { return leftLevel > rightLevel; }; 
     }
+
+    std::function<bool(int leftLevel, int rightLevel)> levelEvaluator = {
+        [&levelComparison](int leftLevel, int rightLevel) { 
+            int difference = abs(leftLevel - rightLevel);
+            return (difference > 0 && difference <= 3) && levelComparison(leftLevel, rightLevel);
+        }
+    };
 
     int numberOfLevels = report.size();
     for (int i=0; i<numberOfLevels -1; i++) {
-        if (!(evaluator(report[i], report[i+1]))) {
+        if (!(levelEvaluator(report[i], report[i+1]))) {
+            // delete and recursive call? (whlle report Length > 1)
             return false;
         }
     }
