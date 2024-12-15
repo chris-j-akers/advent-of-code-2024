@@ -39,25 +39,22 @@ bool checkReport(const vector<int> &report) {
         return false;
     }
 
-    // Going to build an evaluation function as a lamda, starting with which
-    // comparison to use.
-    std::function<bool(int leftLevel, int rightLevel)> levelComparison;
+    std::function<bool(int a, int b)> evaluator;
     if (report[0] < report[1]) {
-        levelComparison = [](int leftLevel, int rightLevel) { return leftLevel < rightLevel; }; 
+        evaluator = [](int a, int b) {
+            int difference = abs(a - b);
+            return (difference > 0 && difference <= 3) && a < b; 
+        };
     } else {
-        levelComparison = [](int leftLevel, int rightLevel) { return leftLevel > rightLevel; }; 
+        evaluator = [](int a, int b) { 
+            int difference = abs(a - b);
+            return (difference > 0 && difference <= 3) && a > b; 
+        };
     }
-
-    std::function<bool(int leftLevel, int rightLevel)> levelEvaluator = {
-        [&levelComparison](int leftLevel, int rightLevel) { 
-            int difference = abs(leftLevel - rightLevel);
-            return (difference > 0 && difference <= 3) && levelComparison(leftLevel, rightLevel);
-        }
-    };
 
     int numberOfLevels = report.size();
     for (int i=0; i<numberOfLevels -1; i++) {
-        if (!(levelEvaluator(report[i], report[i+1]))) {
+        if (!(evaluator(report[i], report[i+1]))) {
             return false;
         }
     }
