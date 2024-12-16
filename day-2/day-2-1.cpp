@@ -65,7 +65,7 @@ bool checkReport(const vector<int> &report) {
 }
 
 int main() {
-    vector<vector<int>> reportsVector = loadReports("./success.txt");
+    vector<vector<int>> reportsVector = loadReports("./suspect-successes.txt");
 
     int correctResults = 0;
     for (auto report : reportsVector) {

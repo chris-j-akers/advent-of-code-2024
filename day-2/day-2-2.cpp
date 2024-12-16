@@ -1,82 +1,154 @@
 #include<iostream>
 #include<fstream>
 #include<string>
-#include<vector>
+#include<list>
 #include<sstream>
 #include<functional>
 
 using namespace std;
 
-// I think there are 332 safe reports.
+// I think there are 398 safe reports.
 
-vector<int> getVectorOfNumsFromString(const string s) {
-    vector<int> returnVector;    
+string reportToString(const list<int> &report) {
+    ostringstream os;
+    for (auto level: report) {
+        os << level << ' ';
+    }
+    return os.str();
+}
+
+list<int> extractLevelsFromReportString(const string s) {
+    list<int> returnList;    
     int startPos = 0;
     int currPos = 0;
     string levelStr;
     while(currPos < s.size()) {
         currPos = s.find(" ", startPos);
         levelStr = s.substr(startPos, currPos-startPos);        
-        returnVector.push_back(stoi(levelStr));
+        returnList.push_back(stoi(levelStr));
         startPos = currPos+1;
     }
-    return returnVector;
+    return returnList;
 }
 
-vector<vector<int>> loadReports(const string inputFilePath) {
+vector<list<int>> loadReports(const string inputFilePath) {
     ifstream inputFile(inputFilePath);
     string line;
-    string num;
-    vector<vector<int>> newReport;
+    vector<list<int>> newReport;
     while (std::getline(inputFile, line)) {
-        newReport.push_back(getVectorOfNumsFromString(line));
+        newReport.push_back(extractLevelsFromReportString(line));
     }
     return newReport;
 }
 
-
-// Should be 'getEvaluator()'
-
-std::function<bool(int leftLevel, int rightLevel)> getEvaluator(const vector<int> report) {
-    
-}
-
-bool checkReport(const vector<int> &report) {
-    if (report[0] == report[1]) {
+bool firstTwoLevelsTheSame(const list<int> &report) {
+    if (report.size() < 2) {
         return false;
     }
-    // Going to build an evaluation function as a lamda, starting with which
-    // comparison to use.
-    std::function<bool(int leftLevel, int rightLevel)> levelComparison;
-    if (report[0] < report[1]) {
-        levelComparison = [](int leftLevel, int rightLevel) { return leftLevel < rightLevel; }; 
-    } else {
-        levelComparison = [](int leftLevel, int rightLevel) { return leftLevel > rightLevel; }; 
+    auto iter = report.begin();
+    return *iter == *(++iter);
+}
+
+void deleteListItemAt(list<int> &report, int pos) {
+    auto iter = report.begin();
+    for (int index=0; index != pos; index++) {
+        iter++;
     }
+    report.erase(iter);
+}
 
-    std::function<bool(int leftLevel, int rightLevel)> levelEvaluator = {
-        [&levelComparison](int leftLevel, int rightLevel) { 
-            int difference = abs(leftLevel - rightLevel);
-            return (difference > 0 && difference <= 3) && levelComparison(leftLevel, rightLevel);
-        }
-    };
+// Build a lambda, depending on whether we're increasing or decreasing. A lot of
+// code for just one boolean expression!
+std::function<bool(int a, int b)> getEvaluator(const list<int> &report) {
+    auto iter = report.begin();    
+    if (*iter < *(++iter)) {
+        return [](int leftLevel, int rightLevel) { 
+                    return leftLevel < rightLevel;
+        };
+    }
+    else {
+        return [](int leftLevel, int rightLevel) { 
+                    return leftLevel > rightLevel;
+        };
+    }
+}
 
-    int numberOfLevels = report.size();
-    for (int i=0; i<numberOfLevels -1; i++) {
-        if (!(levelEvaluator(report[i], report[i+1]))) {
-            // delete and recursive call? (whlle report Length > 1)
+bool checkReport(list<int> &report, std::function<bool(int a, int b)> evaluator) {
+    int leftLevel, rightLevel, difference;
+    for (auto iter = report.begin(); iter != --report.end(); ++iter) {
+      
+        // There's some funky iterator stuff, here I got in trouble with.
+        //
+        // When passing iterator values as params they will be de-referenced and 
+        // evaluated in the same statement, so I can't do: 
+        //
+        // evaluator(*iter, *(++iter).
+        // 
+        // ^^^ This = race-condition and ends up passing the same value for each 
+        // parameter.
+        //
+        // I can do this above, in the boolean comparision expression because 
+        // the left is evaluated before the right in sequence.
+
+        leftLevel = *iter;
+        rightLevel = *(++iter);        
+        difference = abs(leftLevel - rightLevel);
+
+        if (!(difference > 0 && difference <= 3) || !evaluator(leftLevel, rightLevel)) {        
             return false;
         }
+        else {
+            --iter;
+        }
     }
-    return true;    
+    return true;   
+}
+
+// Bit brute-forcey. We just have to try removing a level from the report and
+// re-testing one at a time. This is tricky because it's a list, but still better
+// than using a vector when we're removing items.
+bool applyDampener(const list<int> &report) {
+    list<int> reportCopy = report;    
+    int reportLength = report.size();
+    for(int level=0; level < reportLength; level++) {
+        
+        deleteListItemAt(reportCopy, level);
+        
+        // Edgecase failure. Bastard.
+        if (firstTwoLevelsTheSame(reportCopy)) {
+            reportCopy = report;
+            continue;
+        }
+        
+        if (checkReport(reportCopy, getEvaluator(reportCopy))) {
+            return true;
+        }
+        else {
+            reportCopy = report;
+        }
+    }
+
+    return false;
 }
 
 int main() {
-    vector<vector<int>> reportsVector = loadReports("./success.txt");
+    vector<list<int>> reportsList = loadReports("./input.txt");
 
-    int correctResults = 0;
-    for (auto report : reportsVector) {
-        if (checkReport(report)) correctResults++;
+    int correctReports = 0;
+    int failedReports = 0;
+
+    for (auto report : reportsList) {
+        if ((!firstTwoLevelsTheSame(report)) && checkReport(report, getEvaluator(report))) {
+            correctReports++;
+        } 
+        else {
+            if (applyDampener(report)) {
+                correctReports++;
+            }
+            else {
+                failedReports++;
+            }
+        }
     }
-    cout << correctResults << " safe reports." << endl;
+    cout << correctReports << " safe reports." << endl;
 }
