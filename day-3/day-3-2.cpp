@@ -39,12 +39,22 @@ long sumAllMultis(vector<Multi> multis) {
 }
 
 vector<Multi> extractMultis(const string text) {
-    regex multiRegex("mul\\(\\d{1,3},\\d{1,3}\\)");
-
+    regex multiRegex("(mul\\(\\d{1,3},\\d{1,3}\\))|do\\(\\)|don\\'t\\(\\)");
+    bool recordOn = true;
     vector<Multi> returnVector;
+
     for (std::sregex_iterator i = sregex_iterator(text.begin(), text.end(), multiRegex); i != sregex_iterator(); ++i) {
-        smatch multi = *i;
-        returnVector.push_back(Multi(multi.str()));
+        smatch instruction = *i;
+
+        if (instruction.str() == "don't()") {
+            recordOn = false;
+        }
+        if (instruction.str() == "do()") {
+            recordOn = true;
+        }
+        if (instruction.str().substr(0,3) == "mul" && recordOn) {
+            returnVector.push_back(Multi(instruction.str()));
+        }
     }
     return returnVector;
 }
