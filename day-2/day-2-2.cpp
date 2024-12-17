@@ -41,6 +41,9 @@ vector<list<int>> loadReports(const string inputFilePath) {
     return newReport;
 }
 
+// This helps us with a couple of edge-cases where the first two levels of a 
+// report are the same. It means we can't select an evaluator so need to
+// fail it directly.
 bool firstTwoLevelsTheSame(const list<int> &report) {
     if (report.size() < 2) {
         return false;
@@ -49,6 +52,8 @@ bool firstTwoLevelsTheSame(const list<int> &report) {
     return *iter == *(++iter);
 }
 
+// Lets us remove an item from a list at a specific index. This is still more
+// efficient than using a vector to delete, so there.
 void deleteListItemAt(list<int> &report, int pos) {
     auto iter = report.begin();
     for (int index=0; index != pos; index++) {
