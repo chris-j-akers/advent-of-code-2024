@@ -1,0 +1,49 @@
+
+  0123456789 
+0 MMMSXXMASM
+1 MSAMXMSMSA
+2 AMXSXMAAMM
+3 MSAMASMSMX
+4 XMASAMXAMM
+5 XXAMMXXAMA
+6 SMSMSASXSS
+7 SAXAMASAAA
+8 MAMMMXMMMM
+9 MXMXAXMASX
+
+(0,0)
+
+
+for x=0 to 9:
+    for y=0 to 9:
+     -- start at (0,0)
+
+
+Left to right: 0,0 - 0,1 - 0,2 - 0,3 (x+1)
+right to left: 0,0 <stop>
+top to bottom: 0,0 - 1,0 - 2,0 - 3,0 (y+1)
+bottom to top: 0,0 <stop>            (y-1)
+
+NE = 4,0 3,1 - 2,2 - 1, 3 (x-1, y+1)
+SE = 0,0 1,1 2,2, 3,3  (x+1, y+1)
+NW = 9,9 - 8,8 - 7,7  (x-1, y-1)
+SW = 0,9 - 1,8 - 2,7   (x+1, y-1)
+
+
+N = y-1
+S = y+1
+E = x+1
+W = x-1
+
+NE = (x-1, y+1)
+SE = (x+1, y+1)
+NW = (x-1, y-1)
+SW = (x+1, y-1)
+
+checkNorth()
+
+- until totalMoved = 4, or one of the co-ords is less than zero
+
+CheckSouth()
+
+
