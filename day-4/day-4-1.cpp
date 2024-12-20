@@ -7,6 +7,19 @@
 
 using namespace std;
 
+// 2549 
+
+struct position {
+    int x;
+    int y;
+
+    position(int x, int y) {
+        this->x = x;
+        this->y = y;
+    }
+} typedef position;
+
+
 string wordSearchToString(const vector<vector<char>> &wordSearch) {
     ostringstream os;
     for ( auto line: wordSearch) {
@@ -40,17 +53,11 @@ vector<vector<char>> loadWordSearch(const string inputFilePath) {
     return newWordSearch;
 }
 
-bool checkNorth(const vector<vector<char>> wordSearch, const int xStart, const int yStart) {
-    cout << "Check North (" << yStart << "," << xStart << ")" << endl;           
-    if (yStart < 3) return 0;
-    string xmas = "";
-    int charCount = 0;
-    for (int y = yStart; charCount <4; y--) {
-        xmas.push_back(wordSearch[y][xStart]);
-        charCount++;
-    }
-    cout << "  Found pattern: " << xmas;
-    if (xmas == "XMAS") {
+// Moved this out just because I didn't like it being repeated in every 
+// check...() function.
+bool checkPattern(const string foundWord) {
+    cout << "Found pattern " << foundWord;
+    if (foundWord == "XMAS") {
         cout << ", returning true." << endl;
         return true;
     }
@@ -58,92 +65,87 @@ bool checkNorth(const vector<vector<char>> wordSearch, const int xStart, const i
     return false;
 }
 
+bool checkVertical(const vector<vector<char>> wordSearch, const position &startPosition, std::function<int(int n)> moveCursor) {
+    cout << "Check vertical (" << startPosition.x << "," << startPosition.y << "): ";
+    string foundWord = "";
+    int cursor = startPosition.y;
 
-
-bool checkSouth(const vector<vector<char>> wordSearch, const int xStart, const int yStart) {
-    if (yStart > 6) return 0;
-    string xmas = "";
-    int charCount = 0;
-    for (int y = yStart; charCount <4; y++) {
-        cout << "cords (" << y << ", " << xStart << ")" << ": " << wordSearch[y][xStart] << endl;
-        xmas.push_back(wordSearch[y][xStart]);
-        charCount++;
+    for (int charCount=0; charCount <4; charCount++) {
+        foundWord.push_back(wordSearch[cursor][startPosition.x]);
+        cursor = moveCursor(cursor);
     }
-    cout << "Found pattern: " << xmas;
-    if (xmas == "XMAS") {
-        cout << ", returning true." << endl;
-        return true;
-    }
-    cout << ", returning false" << endl;
-    return false;
+    return checkPattern(foundWord);
 }
 
-int incX(int x) {
-    return x++;
+// We go east or west and we pass a lambda to determine which direction
+bool checkHorizontal(const vector<vector<char>> wordSearch, const position &startPosition, std::function<int(int n)> moveCursor) {
+    cout << "Check horizontal (" << startPosition.x << "," << startPosition.y << "): ";
+    string foundWord = "";
+    int cursor = startPosition.x;
+
+    for (int charCount=0; charCount <4; charCount++) {
+        foundWord.push_back(wordSearch[startPosition.y][cursor]);
+        cursor = moveCursor(cursor);
+    }
+    return checkPattern(foundWord);
 }
 
-bool checkEast(const vector<vector<char>> wordSearch, const int xStart, const int yStart, std::function<int>f(int n)) {
-    cout << "Check East (" << yStart << "," << xStart << ")" << endl;
-    if (xStart > 6) return 0;
-    string xmas = "";
-    int charCount = 0;
-    for (int x = xStart; charCount <4; incX(x)) {
-        cout << "cords (" << yStart << ", " << x << ")" << ": " << wordSearch[yStart][x] << endl;
-        xmas.push_back(wordSearch[yStart][x]);
-        charCount++;
-    }
-    cout << "\tFound pattern: " << xmas;
-    if (xmas == "XMAS") {
-        cout << ", returning true." << endl;
-        return true;
-    }
-    cout << ", returning false" << endl;
-    return false;
-}
+bool checkDiagonal(const vector<vector<char>> wordSearch, const position &startPosition, std::function<int(int n)> moveCursorHorizontal, std::function<int(int n)> moveCursorVertical) {
+    cout << "Check diagonal (" << startPosition.x << "," << startPosition.y << "): ";
+    string foundWord = "";
+    int cursorX = startPosition.x;
+    int cursorY = startPosition.y;
 
-
-bool checkWest(const vector<vector<char>> wordSearch, const int xStart, const int yStart, std::function<int(int n)> f) {
-    cout << "Check West (" << yStart << "," << xStart << ")" << endl;    
-    if (xStart < 3) return 0;
-    string xmas = "";
-    int charCount = 0;
-    for (int x = xStart; charCount <4; x = f(x)) {
-        xmas.push_back(wordSearch[yStart][x]);
-        charCount++;
+    for (int charCount=0; charCount <4; charCount++) {
+        foundWord.push_back(wordSearch[cursorY][cursorX]);
+        cursorX = moveCursorHorizontal(cursorX);
+        cursorY = moveCursorVertical(cursorY);
     }
-    cout << "  Found pattern: " << xmas;
-    if (xmas == "XMAS") {
-        cout << ", returning true." << endl;
-        return true;
-    }
-    cout << ", returning false" << endl;
-    return false;
+    return checkPattern(foundWord);
 }
 
 int countXMAS(const vector<vector<char>> wordSearch) {
     int xLength = wordSearch.size();
     int yLength = wordSearch[0].size();
     int total = 0;
+    
     for (int y=0; y < yLength; y++) {
         for(int x=0; x < xLength; x++) {
+            position pos(x, y);
 
-            //cout << "cords (" << x << ", " << y << ")" << endl;
-            // cout << "Checking North" << endl;
-            //total += checkNorth(wordSearch, x,y);
-            total += checkWest(wordSearch, x,y, [](int n){return n=n-1;});                 
-            // cout << "Checking South" << endl;
-            // total += checkSouth(wordSearch, x,y);
-            // // cout << "Checking East" << endl;
-            // total += checkSouth(wordSearch, x,y);
-                   
+            //Horizontally
+            // L to R
+            if (x+4 <= xLength && checkHorizontal(wordSearch, pos, [](int x){return x=x+1;})) total++;
 
+            // R to L 
+            if (x-4 >=-1 && checkHorizontal(wordSearch, pos, [](int n){return n-1;})) total++;
+
+            // Vertically
+            // T to B
+            if (y + 4 <= yLength && checkVertical(wordSearch, pos, [](int y){return y=y+1;})) total++;
+
+            // B to T
+            if (y-4 >= -1 && checkVertical(wordSearch, pos, [](int y){return y=y-1;})) total++;
+
+            // Diagonally
+            // T to D and L to R
+            if (x+4 <= xLength && y+4 <= yLength && checkDiagonal(wordSearch, pos, [](int x){return x=x+1;}, [](int y){return y=y+1;})) total++;
+
+            // T to D and R to L
+            if (x-4 >= -1 && y+4 <= yLength && checkDiagonal(wordSearch, pos, [](int x){return x=x-1;}, [](int y){return y=y+1;})) total++;
+
+            // B to T and L to R
+            if (x+4 <= xLength && y-4 >=-1 && checkDiagonal(wordSearch, pos, [](int x){return x=x+1;}, [](int y){return y=y-1;})) total++;
+
+            // B to T and R to L
+            if (x-4 >= -1 && y-4 >=-1 && checkDiagonal(wordSearch, pos, [](int x){return x=x-1;}, [](int y){return y=y-1;})) total++;
         }
     }
     return total;
 }
 
 int main() {
-    vector<vector<char>> wordSearch = loadWordSearch("./example.txt");
+    vector<vector<char>> wordSearch = loadWordSearch("./input.txt");
     cout << wordSearchToString(wordSearch) << endl;
     int total = countXMAS(wordSearch);
     cout << "total: " << total << endl;
