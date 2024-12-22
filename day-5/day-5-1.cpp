@@ -19,8 +19,25 @@ pair<Page, Page> getBeforeAndAfterPages(const string s) {
     return make_pair(Page(stoi(s.substr(0, cursor))), Page(stoi(s.substr(cursor+1, s.length()))));
 }
 
-void upsertPageToList(list<Page> pages, Page p) {
-
+void upsertPagesToList(list<Page> &pages, Page before, Page after) {
+    // if first (before) doesn't exist in pages, add it then add second to the after
+    auto p = find(pages.begin(), pages.end(), before);
+    if (p == pages.end()) {
+        before.addPageAfter(after);
+        pages.push_back(before);
+    }
+    else {
+        (*p).addPageAfter(after);
+    }
+    // if second (after) doesn't exist in pages, add it then add first to the before
+    p = find(pages.begin(), pages.end(), after);
+    if (p ==pages.end()) {
+        after.addPageBefore(before);
+        pages.push_back(after);
+    }
+    else {
+        (*p).addPageBefore(before);
+    }
 
 }
 
@@ -30,28 +47,11 @@ list<Page> loadPages(const string inputFilePath) {
     string line;
 
     while (std::getline(inputFile, line) && !line.empty()) {
-        pair<Page, Page> ba = getBeforeAndAfterPages(line);
-        cout << "[" << ba.first.getPageNumber() << " " << ba.second.getPageNumber() << "]" << endl;
-
-        // if first (before) doesn't exist in pages, add it then add second to the after
-        auto p = find(pages.begin(), pages.end(), ba.first);
-        if (p == pages.end()) {
-            ba.first.addPageAfter(ba.second);
-            pages.push_back(ba.first);
-        }
-        else {
-            (*p).addPageAfter(ba.second);
-        }
-        // if second (after) doesn't exist in pages, add it then add first to the before
-        p = find(pages.begin(), pages.end(), ba.second);
-        if (p ==pages.end()) {
-            ba.second.addPageBefore(ba.first);
-            pages.push_back(ba.second);
-        }
-        else {
-            (*p).addPageBefore(ba.first);
-        }
+        pair<Page, Page> beforeAndAfterPages = getBeforeAndAfterPages(line);
+        cout << "[" << beforeAndAfterPages.first.getPageNumber() << " " << beforeAndAfterPages.second.getPageNumber() << "]" << endl;
+        upsertPagesToList(pages, beforeAndAfterPages.first, beforeAndAfterPages.second);
     }
+    
     return pages;
 }
 
