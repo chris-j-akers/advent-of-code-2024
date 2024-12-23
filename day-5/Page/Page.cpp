@@ -10,22 +10,22 @@ int Page::getPageNumber() const {
     return number;
 }
 
-bool Page::operator>(Page p) {
-    if (find(this->before.begin(), this->before.end(), p.getPageNumber()) != this->before.end()) {
+bool Page::isAfter(int pageNumber) const {
+    if (find_if(this->before.begin(), this->before.end(), [pageNumber](const Page& page) { return page.getPageNumber() == pageNumber; }) != this->before.end()) {
         return true;
     }
     return false;
 }
 
-bool Page::operator<(Page p) {
-    if (find(this->after.begin(), this->after.end(), p.getPageNumber()) != this->after.end()) {
+bool Page::isBefore(int pageNumber) const {
+    if (find_if(this->after.begin(), this->after.end(), [pageNumber](const Page& page) { return page.getPageNumber() == pageNumber; }) != this->after.end()) {
         return true;
     }
     return false;
 }
 
-bool Page::operator==(Page p) {
-    return this->getPageNumber() == p.getPageNumber();
+bool Page::isPageNumber(int pageNumber) const {
+    return this->getPageNumber() == pageNumber;
 }
 
 void Page::addPageAfter(Page p) {
@@ -36,26 +36,25 @@ void Page::addPageBefore(Page p) {
     this->before.push_back(p);
 }
 
+bool Page::operator==(Page p) {
+    return this->getPageNumber() == p.getPageNumber();
+}
+
 // Not that pretty, but useful! Forgot all about the << operator having
 // to be overloaded as a 'friend' thing.
 ostream& operator<<(ostream& os, const Page &p) {
-    os << "======" << endl;
-    os << "  " << p.getPageNumber() << endl;
 
-    os << "------" << endl;
-    os << "BEFORE" << endl;
-    os << "------" << endl;
+    os << "[" << p.getPageNumber() << "]";
+
+    os << "\tBEFORE [";
     for (const auto& page : p.before) {
-        os << "  " << page.getPageNumber() << endl;
+        os << page.getPageNumber() << " ";
     }
-
-    os << "-----" << endl;
-    os << "AFTER" << endl;
-    os << "-----" << endl;
+    os << "]";
+    os << "\tAFTER [";
     for (const auto& page : p.after) {
-        os << "  " << page.getPageNumber() << endl;
+        os << page.getPageNumber() << " ";
     }
-    os << "======" << endl;
-
+    os << "]";
     return os;
 }

@@ -2,6 +2,7 @@
 #include<algorithm>
 #include<vector>
 #include<ostream>
+#include<sstream>
 
 using namespace std;
 
@@ -15,8 +16,9 @@ public:
     int getPageNumber() const;
     void addPageBefore(Page p);
     void addPageAfter(Page p);
-    bool operator>(Page p);
-    bool operator<(Page p);
+    bool isAfter(int pageNumber) const;
+    bool isBefore(int pageNumber) const;
+    bool isPageNumber(int pageNumber) const;
     bool operator==(Page p);
     friend ostream& operator<<(ostream& os, const Page &p);
 };
