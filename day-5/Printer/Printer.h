@@ -13,5 +13,6 @@ public:
     void loadPrintJobs();
     void loadConfig();
     void printConfig();
-    
+    vector<vector<int>> getCorrectJobs();
+    bool checkJob(vector<int> job);
 };
