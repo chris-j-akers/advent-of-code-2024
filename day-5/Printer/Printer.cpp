@@ -18,6 +18,10 @@ void Printer::loadPrintJobs() {
     }
 }
 
+void Printer::loadPrintJobs(vector<vector<int>> jobs) {
+    this->printJobs = jobs;
+}
+
 void Printer::loadConfig() {
     this->config.ImportConfiguration(this->configFile);
 }
@@ -55,6 +59,36 @@ vector<vector<int>> Printer::getCorrectJobs() {
         }        
     }
     return returnVector;
+}
+
+vector<vector<int>> Printer::getInCorrectJobs() {
+    vector<vector<int>> returnVector;
+    for (auto job : this->printJobs) {
+        if (!checkJob(job)) {
+            returnVector.push_back(job);
+        }        
+    }
+    return returnVector;
+}
+
+void Printer::reorderJobs() {
+    // We've set this up so we can just bubble sort them all, now.
+    vector<vector<int>> correctedJobs;
+    bool swapped;
+    for (auto &job : this->printJobs) {
+        do {
+            swapped = false;
+            for (int i=0; i<job.size()-1; i++) {
+                Page p = this->config.lookupPage(job[i]);
+                if (!p.isBefore(job[i+1])) {
+                    int temp = job[i];
+                    job[i] = job[i+1];
+                    job[i+1] = temp;
+                    swapped=true;
+                }
+            }
+        } while(swapped==true);
+    }
 }
 
 vector<int> Printer::getVectorOfNumsFromString(const string s) {
