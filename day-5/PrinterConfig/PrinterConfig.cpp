@@ -5,10 +5,8 @@ using namespace std;
 // public
 
 Page PrinterConfig::lookupPage(const int i) {
-
-    // return page number i
-
-    return 0;
+    Page p = *(find_if(this->pageConfig.begin(), this->pageConfig.end(), [i](const Page p) {return p.getPageNumber() == i; }));
+    return p;
 }
 
 void PrinterConfig::ImportConfiguration(const string inputFilePath) {
@@ -28,6 +26,7 @@ string PrinterConfig::toString() {
         os << p;
         os << endl;
     }
+    os << endl;
     return os.str();
 }
 

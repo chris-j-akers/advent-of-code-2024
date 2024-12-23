@@ -18,5 +18,7 @@ using namespace std;
 int main() {
     Printer p("./example.txt");
     p.loadConfig();
+    p.loadPrintJobs();
+
     p.printConfig();
 }

@@ -1,12 +1,12 @@
 #include<list>
 #include<fstream>
+#include<algorithm>
 
 #include "../Page/Page.h"
 
 class PrinterConfig {
     private:
         list<Page> pageConfig;
-        vector<vector<int>> printJob;
 
         pair<Page, Page> getBeforeAndAfterPages(const string s);
         void upsertConfig(Page before, Page after);
@@ -17,5 +17,4 @@ class PrinterConfig {
         Page lookupPage(const int i);
         void printManual();
         string toString();
-
 };

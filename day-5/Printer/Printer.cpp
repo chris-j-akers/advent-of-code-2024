@@ -4,7 +4,7 @@ Printer::Printer(const string configFilePath) {
     this->configFile = configFilePath;
 }
 
-void Printer::loadPrintJob() {
+void Printer::loadPrintJobs() {
     ifstream inputFile(this->configFile);
     string line;
 
@@ -14,7 +14,7 @@ void Printer::loadPrintJob() {
     // Load print orders
     vector<vector<int>> printConfig;
     while (getline(inputFile, line) && !line.empty()) {
-        this->printJob.push_back(getVectorOfNumsFromString(line));
+        this->printJobs.push_back(getVectorOfNumsFromString(line));
     }
 }
 
@@ -25,7 +25,7 @@ vector<int> Printer::getVectorOfNumsFromString(const string s) {
     string levelStr;
     while(currPos < s.size()) {
         currPos = s.find(",", startPos);
-        levelStr = s.substr(startPos, currPos-startPos);        
+        levelStr = s.substr(startPos, currPos-startPos);
         returnVector.push_back(stoi(levelStr));
         startPos = currPos+1;
     }
@@ -36,6 +36,19 @@ void Printer::loadConfig() {
     this->config.ImportConfiguration(this->configFile);
 }
 
+
 void Printer::printConfig() {
+    cout << "PRINTER CONFIGURATION" << endl;
+    cout << "---------------------" << endl;
     cout << this->config.toString() << endl;
+    cout << "JOB LIST" << endl;
+    cout << "--------" << endl;
+    for(auto j: this->printJobs) {
+        for (auto k: j) {
+            cout << k << ",";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
 }
