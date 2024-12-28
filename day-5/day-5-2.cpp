@@ -39,7 +39,8 @@ int main() {
     // This is a bit of a casserole of nonsense, but I have to move on!
 
     // I assumed that we would be asked to resort the jobs, but not to get some
-    // weird value from the middle of the printer jobs array. So, I have to 
+    // weird value from the middle of the printer jobs array, though that makes 
+    // sense to stop me faking the answer,  So, I have to 
     // create the first printer, get all the incorrect jobs and load them into
     // a second printer, then run the re-order and get the total. Such a pain,
     // but if I refactored everything now it would take all day and, besides, 
