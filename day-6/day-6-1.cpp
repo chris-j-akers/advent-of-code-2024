@@ -144,11 +144,10 @@ int main() {
     Coords startPos = getGuardStartPosition(map);
     Guard g(getGuardStartPosition(map), NORTH);
 
-
     cout << g.toString() << endl;
     cout << mapToString(map) << endl;
     cout << "----------" << endl << endl;
-    
+
     while(g.move(map) != true) {
         cout << g.toString() << endl;
     }
