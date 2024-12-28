@@ -13,7 +13,7 @@ struct Coords {
     int x;
     int y;
 
-    Coords(int x, int y) : x(x), y(y) {}
+    Coords(const int x, const int y) : x(x), y(y) {}
     Coords() {}
     
     char objectAt(const Map map) {
@@ -34,7 +34,7 @@ struct Guard {
     int positionCount = 1;
 
     Guard() {}
-    Guard(Coords position, Direction direction) : position(position), direction(direction) {}
+    Guard(const Coords position, const Direction direction) : position(position), direction(direction) {}
 
     string toString() {
         ostringstream os;
