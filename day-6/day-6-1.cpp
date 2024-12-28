@@ -28,7 +28,6 @@ struct Coords {
     }
 
 } typedef Coords;
-
 struct Guard {
     Coords position;
     Direction direction;
@@ -123,7 +122,6 @@ string mapToString(const Map map) {
     return os.str();
 }
 
-
 Map loadMap(const string inputFilePath) {
     ifstream inputFile(inputFilePath);
     string line;
@@ -137,7 +135,6 @@ Map loadMap(const string inputFilePath) {
     }
     return map;
 }
-
 
 int main() {
     Map map = loadMap("./input.txt");
