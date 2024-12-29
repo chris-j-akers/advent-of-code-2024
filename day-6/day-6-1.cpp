@@ -57,7 +57,7 @@ struct Guard {
         return os.str();
     }
 
-    bool move(Map &map) {
+    bool patrol(Map &map) {
         Coords newPosition;
         switch(this->direction) {
             case NORTH: 
@@ -88,7 +88,7 @@ struct Guard {
             // Oof! We turn right by incrementing the enum and modulo 4! :P
             this->direction = static_cast<Direction>(static_cast<int>(this->direction + 1) % 4);
             // ...Then we recurse into the function
-            return this->move(map);
+            return this->patrol(map);
         }
 
         map[this->position.y][this->position.x] = 'X';
@@ -145,7 +145,7 @@ int main() {
     cout << mapToString(map) << endl;
     cout << "----------" << endl << endl;
 
-    while(g.move(map) != true) {
+    while(g.patrol(map) != true) {
         cout << g.toString() << endl;
     }
     cout << "OUT OF AREA!" << endl;
