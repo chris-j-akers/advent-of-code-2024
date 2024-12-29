@@ -2,19 +2,20 @@
 #include<fstream>
 #include <iostream>
 #include <sstream>
+#include<unordered_set>
 #include<algorithm>
+#include <cstdint>
+
 
 using namespace std;
 
-// Right, right, right. I'm thinking we don't always need to start the guard in 
-// the same position? Because if we know her path is clear up to the obstruction
-// then we don't need her to walk it. How about we always start the guard one
-// position begin the obstruction!?!?!?
+// This is exactly the same as the other one but with an unordered_set instead
+// of a vector to store the obstruction list. I didn't think it would make
+// much difference, and it didn't - there's really not that much data, here.
 
-// Pffft. 1 minute. Not great, but better than the previous ones.
 // ---
 // Total number of obstructions that could cause a loop: 1503
-// ./a.out  59.82s user 0.01s system 99% cpu 59.851 total
+// ./a.out  59.23s user 0.00s system 99% cpu 59.240 total
 
 vector<vector<char>> typedef Map;
 enum Direction { NORTH=0, EAST=1, SOUTH=2, WEST=3 };
@@ -32,7 +33,7 @@ struct Coords {
         return retval;
     }
 
-    bool operator==(const Coords &c) {
+    bool operator==(const Coords &c) const {
         if (this->x == c.x && this->y == c.y && this->direction == c.direction) {
             return true;
         } else {
@@ -55,12 +56,11 @@ struct Obstruction {
     Obstruction() {}
     Obstruction(Coords coords) : coords(coords) {}
 
-    bool operator==(const Obstruction &de) {
+    bool operator==(const Obstruction &de) const {
         if (this->coords == de.coords) {
             return true;
-        } else {
-            return false;
-        }
+        } 
+        return false;
     }
 
     string toString() const {
@@ -71,9 +71,16 @@ struct Obstruction {
 
 } typedef Obstruction;
 
+struct ObstructionHash {
+    size_t operator()(const Obstruction ob) const 
+    {
+        return hash<uint32_t>()(ob.coords.x + ob.coords.y + ob.coords.direction) ^ hash<uint32_t>()(ob.coords.x + ob.coords.y + ob.coords.direction);
+    }
+};
+
 struct Guard {
     vector<Coords>trail;
-    vector<Obstruction> obstructionList;
+    unordered_set<Obstruction, ObstructionHash> obstructionList;
     Coords position;
     Coords startPosition;
 
@@ -146,7 +153,7 @@ struct Guard {
                 if (find(this->obstructionList.begin(), this->obstructionList.end(), ob) != this->obstructionList.end()) {
                     return true;
                 } else {
-                    this->obstructionList.push_back(Obstruction(this->position));
+                    this->obstructionList.insert(Obstruction(this->position));
                 }
                 this->position.direction = static_cast<Direction>(static_cast<int>(this->position.direction + 1) % 4);
                 continue;
