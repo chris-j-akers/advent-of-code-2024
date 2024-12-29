@@ -151,6 +151,7 @@ struct Guard {
     bool patrol(Map &map) {
         Coords newPosition;
         while(true) {
+            this->trail.push_back(this->position);
             switch(this->position.direction) {
                 case NORTH: 
                     newPosition  = Coords(this->position.x, this->position.y -1, this->position.direction);
@@ -187,7 +188,6 @@ struct Guard {
             this->position = newPosition;
             if (newPosition.objectAt(map) != 'X') {
                 this->positionCount++;
-                this->trail.push_back(this->position);
             }
         }
     }
@@ -232,23 +232,34 @@ Map loadMap(const string inputFilePath) {
 }
 
 int main() {
-    Map map = loadMap("./input.txt");
+    Map map = loadMap("./example.txt");
     Coords startPos = getGuardStartPosition(map);
     Guard g(getGuardStartPosition(map));
 
     if (g.patrol(map) == true) {
-        cout << "Guard made it out of the area with " << g.positionCount << " positions recorded. Now we're going to try and jam her." << endl;
+        cout << "Guard made it out of the area with " << g.positionCount << " distinct positions recorded." << endl;
     }
 
+    cout << endl << "---" << endl << g.trail.size() << " total positions recorded: " << endl;
+
+    for (auto pos : g.trail) {
+        cout << pos.toString() << " ";
+    }
+    cout << endl;
+
+    cout << endl << "---" << endl << "Jamming time" << endl;
+
     int obstructionCount = 0;
-    for (Coords footstep : g.trail) {
-        g.reset();
-        map[footstep.y][footstep.x] = '#';
-            if (g.jam(map)) {
-                cout << "Guard got stuck in loop with obstruction at: " << "(" << footstep.x << "," << footstep.y << ")" << ", obstructions found: " << g.obstructionList.size() << endl;
-                obstructionCount++;
-            }
-            map[footstep.y][footstep.x] = '.';
+    vector<Coords> trail = g.trail;
+
+    for (int p=0; p<trail.size()-1; p++) {
+        Guard g(trail[p]);
+        map[trail[p+1].y][trail[p+1].x] = '#';
+        if (g.jam(map)) {
+            cout << "Guard at position " << trail[p].toString() << " trail index " << p << ", got stuck in loop with obstruction at: " << "(" << trail[p+1].x << "," << trail[p+1].y << ")" << ", obstructions found: " << g.obstructionList.size() << endl;
+            obstructionCount++;
+        }
+        map[trail[p+1].y][trail[p+1].x] = '.';
     }
     cout << endl << "---" << endl << "Total number of obstructions that could cause a loop: " << obstructionCount << endl;
    
