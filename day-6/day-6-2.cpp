@@ -180,7 +180,7 @@ string mapToString(const Map map) {
 Map loadMap(const string inputFilePath) {
     ifstream inputFile(inputFilePath);
     string line;
-    vector<vector<char>> map;
+    Map map;
     while (getline(inputFile, line)) {
         vector<char> mapLine;
         for (char c : line) {
