@@ -63,7 +63,7 @@ struct Equation {
         return os.str();
     }
 
-} typedef Equation;
+};
 
 vector<Equation> typedef Equations;
 

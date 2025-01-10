@@ -41,7 +41,7 @@ struct Coords {
         return os.str();
     }
 
-} typedef Coords;
+};
 
 struct Obstruction {
     Coords coords;
@@ -64,7 +64,7 @@ struct Obstruction {
         return os.str();
     }
 
-} typedef Obstruction;
+};
 
 struct Guard {
     vector<Coords>trail;

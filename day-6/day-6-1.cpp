@@ -27,7 +27,7 @@ struct Coords {
         return os.str();
     }
 
-} typedef Coords;
+};
 struct Guard {
     Coords position;
     Direction direction;

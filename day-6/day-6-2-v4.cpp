@@ -47,7 +47,7 @@ struct Coords {
         return os.str();
     }
 
-} typedef Coords;
+};
 
 struct Obstruction {
     Coords coords;
@@ -69,7 +69,7 @@ struct Obstruction {
         return os.str();
     }
 
-} typedef Obstruction;
+};
 
 struct ObstructionHash {
     size_t operator()(const Obstruction ob) const 

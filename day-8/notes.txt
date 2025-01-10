@@ -56,3 +56,10 @@ Draw a line through it
 
 (adding vector 1,0)
 
+Build lists of nodes
+For each node in a lists
+    get the difference between each node (nested for, or whatever)
+    This will give you another co-ordinate
+    Subtract the difference from the current node
+    Check it's on the board
+    etc
