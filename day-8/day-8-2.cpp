@@ -5,6 +5,9 @@
 #include<unordered_map>
 #include<algorithm>
 
+
+// 390
+
 using namespace std;
 
 struct Coords {
@@ -157,11 +160,19 @@ int main() {
                     continue;
                 }
                 Coords diff = antenna2 - antenna1;
-                Coords antiNode = antenna1 - diff;
-                if (am.inBounds(antiNode)) {
-                    am.upsertAntiNodes(antiNode);
+                Coords next = diff;
+                bool inBounds = true;
+                while(inBounds) {
+                    Coords antiNode = antenna1 - next;
+                    if (am.inBounds(antiNode)) {
+                        am.upsertAntiNodes(antiNode);
+                        next = next + diff;
+                    } else {
+                        inBounds = false;
+                    }
                 }
             }
+            am.upsertAntiNodes(antenna1);        
         }
     }
 
