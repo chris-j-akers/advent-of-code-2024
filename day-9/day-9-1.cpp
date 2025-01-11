@@ -6,6 +6,8 @@
 
 using namespace std;
 
+// 6288707484810
+
 class Block {
     int fileId;
 
@@ -57,15 +59,31 @@ public:
     }
 
     void defrag() {
-        auto nextFreeSlot = getNextFreeSlot();
-        for (auto b = this->map.rbegin(); b != this->map.rend(); b++) {
+        for (vector<Block>::reverse_iterator b = this->map.rbegin(); b != this->map.rend(); b++) {
             if (!(*b).isFree()) {
+                vector<Block>::iterator nextFreeSlot = getNextFreeSlot();
+                
+                // if nextFreeSlot position comes after the reverse_iterator (b)
+                // then we are de-fragged
+                if (nextFreeSlot > --b.base()) {
+                    break;
+                }
                 *nextFreeSlot = *b;
                 *b = Block(-1);
             }
-            nextFreeSlot = getNextFreeSlot();  
-            cout << this->toString() << endl;
         }
+    }
+
+    long calculateChecksum() {
+        int mapSize = this->map.size();
+        long total = 0;
+        for (int i=0; i<mapSize; i++) {
+            int fileId = this->map[i].getFileId();
+            if (fileId >= 0) {
+                total += (i * fileId);
+            }
+        }
+        return total;
     }
 
     string toString() {
@@ -80,11 +98,12 @@ public:
 
 int main() {
     DiskMap dm;
-    dm.loadDiskmap("./example.txt");
+    dm.loadDiskmap("./input.txt");
     cout << "\n---\nBefore:" << endl;
     cout << dm.toString() << endl;
     dm.defrag();
     cout << "\n---\nAfter:" << endl;    
     cout << dm.toString() << endl;
+    cout << "\n---\nChecksum: " << dm.calculateChecksum() << endl;
 }
 
