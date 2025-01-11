@@ -172,8 +172,7 @@ int main() {
                         inBounds = false;
                     }
                 }
-            }
-       
+            }      
         }
     }
 
