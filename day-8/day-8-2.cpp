@@ -155,6 +155,7 @@ int main() {
 
     for (auto antenna_list: ad.getDirectory()) {
         for(auto antenna1 : antenna_list.second) {
+            am.upsertAntiNodes(antenna1);            
             for (auto antenna2 : antenna_list.second) {
                 if (antenna2 == antenna1) {
                     continue;
@@ -172,7 +173,7 @@ int main() {
                     }
                 }
             }
-            am.upsertAntiNodes(antenna1);        
+       
         }
     }
 
