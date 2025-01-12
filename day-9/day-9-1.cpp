@@ -27,7 +27,7 @@ public:
         if (this->fileId == -1)
             os << ".";
         else
-            os << this->fileId;
+            os << "[" << this->fileId << "]";
         return os.str();
     }
 };
