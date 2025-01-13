@@ -14,7 +14,6 @@ class Block {
     public:
         Block(int size) : size(size) {}
         virtual ~Block() = default;
-
         virtual string toString() const = 0;
 
         int getSize() const { 
@@ -74,25 +73,16 @@ class DiskMap {
             }
         }
 
-        long calculateChecksum() {
-            // As before, the way we insert the fileblocks means we will be 
-            // left with FreeBlocks next to each other which will also need
-            // defragging. This is easy to get around in the calculation.
-            // Maybe another freespace merge function could be written in the
-            // future :shrug:
-            int position = 0;
-            long total = 0;
-            for (Block* block : this->map) {
-                for (int i=0; i<block->getSize(); i++) {
-                    if (typeid(*block) == typeid(FileBlock))
-                        total += position * ((FileBlock*)block)->getFileId();
-                    position++;
-                }
+        string toString() const {
+            ostringstream os;
+            for (auto b : this->map) {
+                os << b->toString();
             }
-            return total;
+            os << endl;
+            return os.str();
         }
 
-        bool isFree(Block* b) {
+        bool isFree(Block* b) const {
             return typeid(*b) == typeid(FreeBlock);
         }
 
@@ -137,13 +127,22 @@ class DiskMap {
             }
         }
 
-        string toString() {
-            ostringstream os;
-            for (auto b : this->map) {
-                os << b->toString();
+        long calculateChecksum() const {
+            // As before, the way we insert the fileblocks means we will be 
+            // left with FreeBlocks next to each other which will also need
+            // defragging. This is easy to get around in the calculation.
+            // Maybe another freespace merge function could be written in the
+            // future :shrug:
+            int position = 0;
+            long total = 0;
+            for (Block* block : this->map) {
+                for (int i=0; i<block->getSize(); i++) {
+                    if (typeid(*block) == typeid(FileBlock))
+                        total += position * ((FileBlock*)block)->getFileId();
+                    position++;
+                }
             }
-            os << endl;
-            return os.str();
+            return total;
         }
 };
 

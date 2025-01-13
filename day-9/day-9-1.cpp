@@ -22,7 +22,7 @@ public:
         return this->fileId == -1;
     }
 
-    string toString() {
+    string toString() const {
         ostringstream os;
         if (this->fileId == -1)
             os << ".";
@@ -54,6 +54,15 @@ public:
         }
     }
 
+    string toString() const {
+        ostringstream os;
+        for (auto b : this->map) {
+            os << b.toString();
+        }
+        os << endl;
+        return os.str();
+    }
+
     vector<Block>::iterator getNextFreeSlot() {
         return find_if(this->map.begin(), this->map.end(), [](const Block& b) {return b.isFree();});
     }
@@ -74,7 +83,7 @@ public:
         }
     }
 
-    long calculateChecksum() {
+    long calculateChecksum() const {
         int mapSize = this->map.size();
         long total = 0;
         for (int i=0; i<mapSize; i++) {
@@ -84,15 +93,6 @@ public:
             }
         }
         return total;
-    }
-
-    string toString() {
-        ostringstream os;
-        for (auto b : this->map) {
-            os << b.toString();
-        }
-        os << endl;
-        return os.str();
     }
 };
 
