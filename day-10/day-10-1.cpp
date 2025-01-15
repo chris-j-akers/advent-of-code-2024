@@ -15,12 +15,16 @@ struct Position {
     Position() {}
     Position(const int x, const int y, const int val) : x(x), y(y), val(val) {}
 
+    bool operator==(Position p) {
+        return this->x == p.x && this->y == p.y && this->val == p.val;
+    }
+
     string toString() const {
         ostringstream os;
         os << "[" << this->val << ":(" << this->x << "," << this->y << ")]";
         return os.str();
     }
-};    
+};
 
 class TrailMap {
     vector<vector<Position>> map;
@@ -34,7 +38,7 @@ public:
             vector<Position> mapLine;
             int col = 0;
             for (char c : line) {
-                mapLine.push_back(Position(row, col, c -'0' ));
+                mapLine.push_back(Position(col, row, c -'0' ));
                 col++;
             }
             map.push_back(mapLine);
@@ -53,8 +57,11 @@ public:
         return this->map.size();
     }
     
-    bool withinBounds(const Position p) const {
-        return false;
+    bool withinBounds(int x, int y) const {
+        if (x >= 0 && x < this->getWidth() && y >= 0 && y < this->getLength())
+            return true;
+        else
+            return false;
     }
 
     string toString() const {
@@ -71,7 +78,7 @@ public:
         return os.str();
     }
 
-    vector<Position> getValidStartPositions(const int startVal) const {
+    vector<Position> getTrailHeads(const int startVal) const {
         vector<Position> startPositions;
         for (auto row : this->map) {
             for (auto col : row) {
@@ -81,37 +88,54 @@ public:
         }
         return startPositions;
     }
+
+    // Misread the question. This is about how many 9s in the map are
+    // reachable, not how many trails there are.
+    // Build a dictionary/hash/unordered_set and upsert them each time, return the
+    // list for each trail head and then count them.
+    int countTrails(int x, int y, int reqVal, vector<Position>& endPositions) {
+        if (!this->withinBounds(x,y)) {
+            return 0;
+        }
+
+        if (reqVal == 9 && this->map[y][x].val == 9) {
+            if (find(endPositions.begin(), endPositions.end(), this->map[y][x]) == endPositions.end()) {
+                endPositions.push_back(this->map[y][x]);
+            }
+            return 1;
+        }
+
+        if (this->map[y][x].val == reqVal) {
+            return 
+                // North
+                countTrails(x, y-1, reqVal+1, endPositions) +
+                // South
+                countTrails(x, y+1, reqVal+1, endPositions) +
+                // East
+                countTrails(x+1 ,y, reqVal+1, endPositions) +
+                // West
+                countTrails(x-1, y, reqVal+1, endPositions);
+        }
+        else {
+            return 0;
+        }
+    }
 };
 
 int main() {
     TrailMap tm;
     tm.loadFromFile("./example.txt");
     cout << tm.toString() << endl;
-    vector<Position> startPositions = tm.getValidStartPositions(1);
+    vector<Position> startPositions = tm.getTrailHeads(0);
+    vector<Position> endPositions;
 
-    for (auto p: startPositions)
-        cout << p.toString();
+    int score = tm.countTrails(4,2,0, endPositions);
+
+    for (auto p : endPositions) {
+        cout << p.toString() << " ";
+    }
     cout << endl;
+    cout << "Score is " << endPositions.size() << ".";
+
 }
-
-// Only call this if the current value is 1.
-// Pull a list of all 1s from the map and call countTrails on each one.
-
-// int countTrails(Position p, int val) {
-//     if (c.value == 9) {
-//        return 1;
-//     }
-
-//     // Get New Co-ord
-//     // if within bounds and the value+1 = our current value, then call countTrails()
-
-//     if (c.value == currentTotal) {
-//         if ((c+1).value == c.value+1) {
-//             countTrails(c+1, currentTotal+1);
-//         }
-//         else {
-//             return 0;
-//         }
-//     }
-// }
 
