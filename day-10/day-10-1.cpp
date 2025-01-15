@@ -15,7 +15,7 @@ struct Position {
     Position() {}
     Position(const int x, const int y, const int val) : x(x), y(y), val(val) {}
 
-    bool operator==(Position p) {
+    bool operator==(Position p) const {
         return this->x == p.x && this->y == p.y && this->val == p.val;
     }
 
@@ -57,7 +57,7 @@ public:
         return this->map.size();
     }
     
-    bool withinBounds(int x, int y) const {
+    bool withinBounds(const int x, const int y) const {
         if (x >= 0 && x < this->getWidth() && y >= 0 && y < this->getLength())
             return true;
         else
@@ -79,21 +79,17 @@ public:
     }
 
     vector<Position> getTrailHeads(const int startVal) const {
-        vector<Position> startPositions;
+        vector<Position> trailHeads;
         for (auto row : this->map) {
             for (auto col : row) {
                 if (col.val == startVal)
-                    startPositions.push_back(col);
+                    trailHeads.push_back(col);
             }
         }
-        return startPositions;
+        return trailHeads;
     }
 
-    // Misread the question. This is about how many 9s in the map are
-    // reachable, not how many trails there are.
-    // Build a dictionary/hash/unordered_set and upsert them each time, return the
-    // list for each trail head and then count them.
-    int countTrails(int x, int y, int reqVal, vector<Position>& endPositions) {
+    int countTrails(const int x, const int y, const int reqVal, vector<Position>& endPositions) const {
         if (!this->withinBounds(x,y)) {
             return 0;
         }
@@ -124,18 +120,24 @@ public:
 
 int main() {
     TrailMap tm;
+    
     tm.loadFromFile("./example.txt");
     cout << tm.toString() << endl;
-    vector<Position> startPositions = tm.getTrailHeads(0);
+
+    vector<Position> trailHeads = tm.getTrailHeads(0);
     vector<Position> endPositions;
 
-    int score = tm.countTrails(4,2,0, endPositions);
-
-    for (auto p : endPositions) {
-        cout << p.toString() << " ";
+    int score = 0;
+    for (auto th : trailHeads) {
+        int availableTrails = tm.countTrails(th.x, th.y, 0, endPositions);
+        if (availableTrails > 0) {
+            int numberOfEndPositions = endPositions.size();
+            cout << "Trail head " << th.toString() << " can reach " << availableTrails << " stage 9s, ";
+            cout << numberOfEndPositions << " of which are unique." << endl;
+            score += numberOfEndPositions;
+        }
+        endPositions.clear();
     }
-    cout << endl;
-    cout << "Score is " << endPositions.size() << ".";
-
+    cout << "\n---\n" << "Total score for this map is: " << score << endl;
 }
 
