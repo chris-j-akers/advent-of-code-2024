@@ -50,8 +50,9 @@ void printStones(const vector<Stone>& stones) {
 }
 
 int main() {
-    vector<Stone> stones = loadStones("./input.txt");
-    for (int i=1; i<=50; i++) {
+    //vector<Stone> stones = loadStones("./input.txt");
+    vector<Stone> stones = {Stone(17)};
+    for (int i=1; i<=6; i++) {
         stones = blink(stones);
         cout << i << ": " << stones.size() << endl;;
     }
