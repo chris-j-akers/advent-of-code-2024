@@ -25,7 +25,7 @@ vector<Stone> loadStones(const string inputFilePath) {
     return stones;
 }
 
-// Record the results of certain numbers in a hash set?
+// Record the results of certain numbers in a hash set? Not quite there...
 
 unordered_map<long, vector<long>> cache;
 long cacheHit = 0;
