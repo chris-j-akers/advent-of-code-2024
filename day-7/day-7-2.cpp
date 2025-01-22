@@ -65,7 +65,7 @@ struct Equation {
 
 };
 
-vector<Equation> typedef Equations;
+using Equations = vector<Equation>;
 
 queue<int> getEquationVals(const string s) {
     queue<int> vals;

@@ -17,7 +17,7 @@ using namespace std;
 // Total number of obstructions that could cause a loop: 1503
 // ./a.out  59.23s user 0.00s system 99% cpu 59.240 total
 
-vector<vector<char>> typedef Map;
+using Map=vector<vector<char>>;
 enum Direction { NORTH=0, EAST=1, SOUTH=2, WEST=3 };
 
 struct Coords {

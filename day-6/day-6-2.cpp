@@ -11,7 +11,7 @@
 using namespace std;
 
 // Let's get a little more domain-oriented
-vector<vector<char>> typedef Map;
+using Map = vector<vector<char>>;
 
 enum Direction { NORTH=0, EAST=1, SOUTH=2, WEST=3 };
 

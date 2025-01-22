@@ -34,7 +34,7 @@ namespace std {
 }
 
 // We'll use this as our cache in conjunction with the function above.
-typedef unordered_map<pair<long, long>, long> Cache;
+using Cache = unordered_map<pair<long, long>, long>;
 
 struct Stone {
     long val;
