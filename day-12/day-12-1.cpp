@@ -36,6 +36,8 @@ struct Region {
     int area;
     int perimeter;
 
+    Region(const char id) : id(id), area(0), perimeter(0) {}
+
     bool operator==(const char rId) const {
         return this->id == rId;
     }
@@ -98,31 +100,32 @@ public:
         return os.str(); 
     }
     
-    int getAreas(const char plotId, const Coords c, vector<Coords>& plotsVisited) const {
+    void getRegionData(const Coords c, Region& r, vector<Coords>& plotsVisited) const {
         if (!this->withinBounds(c)) {
-            return 0;
+            return;
         }        
 
-        if (find(plotsVisited.begin(), plotsVisited.end(), c) != plotsVisited.end())
-            return 0;
+        if (find(plotsVisited.begin(), plotsVisited.end(), c) != plotsVisited.end()) {
+            return;
+        }
 
-        if (this->plots[c.y][c.x] == plotId) {
+        if (this->plots[c.y][c.x] == r.id) {
             // If we don't do this, the thing goes on forever revisiting
             // old plots.
             plotsVisited.push_back(Coords(c.x,c.y));
-            return 1 +
-                // North
-                getAreas(plotId, Coords(c.x, c.y-1), plotsVisited) +
-                // South
-                getAreas(plotId, Coords(c.x, c.y+1), plotsVisited) +
-                // East
-                getAreas(plotId, Coords(c.x+1, c.y), plotsVisited) +
-                // West
-                getAreas(plotId, Coords(c.x-1, c.y), plotsVisited);
+            r.area++;
+            // North
+            getRegionData(Coords(c.x, c.y-1), r, plotsVisited);
+            // South
+            getRegionData(Coords(c.x, c.y+1), r, plotsVisited);
+            // East
+            getRegionData(Coords(c.x+1, c.y), r, plotsVisited);
+            // West
+            getRegionData(Coords(c.x-1, c.y), r, plotsVisited);
         }
         else {
             // So the previous x,y was a perimeter?
-            return 0;
+            return;
         }
     }
     
@@ -131,11 +134,10 @@ public:
         vector<Coords> visitedPlots;
         for (int row=0; row < this->getLength(); row++) {
             for (int col=0; col < this->getWidth(); col++) {
-                Coords plot(col, row);
-                if (find(visitedPlots.begin(), visitedPlots.end(), plot) == visitedPlots.end()) {
-                    Region r;
-                    r.id = this->plots[row][col];
-                    r.area = this->getAreas(r.id, plot, visitedPlots);
+                Coords startCoords(col, row);
+                if (find(visitedPlots.begin(), visitedPlots.end(), startCoords) == visitedPlots.end()) {
+                    Region r(this->plots[row][col]);
+                    this->getRegionData(startCoords,r, visitedPlots);
                     retVal.push_back(r);
                 }
             }
