@@ -35,13 +35,29 @@ struct Region {
     char id;
     int area;
     int perimeter;
+
+    bool operator==(const char rId) const {
+        return this->id == rId;
+    }
+
+    string toString() const {
+        ostringstream os;
+        os << "[id: " << this->id << ". area: " << this->area << ", perimeter: " << this->perimeter;
+        return os.str();
+    }
 };
 
 class Garden {
     vector<vector<char>> plots;
-    vector<char> regionList;
     int plotWidth = 0;
     int plotLength = 0;
+
+    bool withinBounds(const Coords c) const {
+        if (c.x >= 0 && c.x < this->getWidth() && c.y >= 0 && c.y < this->getLength())
+            return true;
+        else
+            return false;
+    }    
 
 public:
     void loadPlots(const string inputFilePath) {
@@ -81,15 +97,7 @@ public:
         }
         return os.str(); 
     }
-
-    bool withinBounds(const Coords c) const {
-        if (c.x >= 0 && c.x < this->getWidth() && c.y >= 0 && c.y < this->getLength())
-            return true;
-        else
-            return false;
-    }
-
-    int countPlots(const char plotId, const Coords c, vector<Coords>& plotsVisited) const {
+    int getAreas(const char plotId, const Coords c, vector<Coords>& plotsVisited) const {
         if (!this->withinBounds(c)) {
             return 0;
         }        
@@ -103,13 +111,13 @@ public:
             plotsVisited.push_back(Coords(c.x,c.y));
             return 1 +
                 // North
-                countPlots(plotId, Coords(c.x, c.y-1), plotsVisited) +
+                getAreas(plotId, Coords(c.x, c.y-1), plotsVisited) +
                 // South
-                countPlots(plotId, Coords(c.x, c.y+1), plotsVisited) +
+                getAreas(plotId, Coords(c.x, c.y+1), plotsVisited) +
                 // East
-                countPlots(plotId, Coords(c.x+1, c.y), plotsVisited) +
+                getAreas(plotId, Coords(c.x+1, c.y), plotsVisited) +
                 // West
-                countPlots(plotId, Coords(c.x-1, c.y), plotsVisited);
+                getAreas(plotId, Coords(c.x-1, c.y), plotsVisited);
         }
         else {
             // So the previous x,y was a perimeter?
@@ -117,16 +125,30 @@ public:
         }
     }
     
+    vector<Region> getRegionData() {
+        vector<Region> retVal;
+        vector<Coords> visitedPlots;
+        for (int row=0; row < this->getLength(); row++) {
+            for (int col=0; col < this->getWidth(); col++) {
+                Coords plot(col, row);
+                if (find(visitedPlots.begin(), visitedPlots.end(), plot) == visitedPlots.end()) {
+                    Region r;
+                    r.id = this->plots[row][col];
+                    r.area = this->getAreas(r.id, plot, visitedPlots);
+                    retVal.push_back(r);
+                }
+            }
+        }
+        return retVal;
+    }
 };
 
 int main() {
     Garden g;
     g.loadPlots("./example.txt");
     cout << g.toString() << endl;
-    vector<Coords> plotsVisited;
-
-    cout << "Beginning plot is: " << startPlot.toString() << endl;
-    int result = g.countPlots('E', startPlot, plotsVisited);
-    cout << result << endl;
-    //cout << g.countPlots('R', 0, 0) << endl;
+    vector<Region> regions = g.getRegionData();
+    for (auto r : regions) {
+        cout << r.toString() << endl;
+    }
 }
