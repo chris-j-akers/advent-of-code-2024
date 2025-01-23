@@ -97,6 +97,7 @@ public:
         }
         return os.str(); 
     }
+    
     int getAreas(const char plotId, const Coords c, vector<Coords>& plotsVisited) const {
         if (!this->withinBounds(c)) {
             return 0;
