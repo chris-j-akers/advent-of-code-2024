@@ -157,7 +157,7 @@ public:
 int main() {
     Garden g;
     g.loadPlots("./input.txt");
-    cout << g.toString() << endl;
+    // cout << g.toString() << endl;
     vector<Region> regions = g.getRegionData();
     long totalPrice = 0;
     for (auto r : regions) {
