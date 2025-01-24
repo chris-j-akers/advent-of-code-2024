@@ -48,14 +48,14 @@ bool firstTwoLevelsTheSame(const list<int> &report) {
     if (report.size() < 2) {
         return false;
     }
-    auto iter = report.begin();
+    auto iter = report.cbegin();
     return *iter == *(++iter);
 }
 
 // Lets us remove an item from a list at a specific index. This is still more
 // efficient than using a vector to delete, so there.
 void deleteListItemAt(list<int> &report, int pos) {
-    auto iter = report.begin();
+    auto iter = report.cbegin();
     for (int index=0; index != pos; index++) {
         iter++;
     }
@@ -65,7 +65,7 @@ void deleteListItemAt(list<int> &report, int pos) {
 // Build a lambda, depending on whether we're increasing or decreasing. A lot of
 // code for just one boolean expression!
 std::function<bool(int a, int b)> getEvaluator(const list<int> &report) {
-    auto iter = report.begin();    
+    auto iter = report.cbegin();    
     if (*iter < *(++iter)) {
         return [](int leftLevel, int rightLevel) { 
                     return leftLevel < rightLevel;
@@ -80,7 +80,7 @@ std::function<bool(int a, int b)> getEvaluator(const list<int> &report) {
 
 bool checkReport(list<int> &report, std::function<bool(int a, int b)> evaluator) {
     int leftLevel, rightLevel, difference;
-    for (auto iter = report.begin(); iter != --report.end(); ++iter) {
+    for (auto iter = report.cbegin(); iter != --report.end(); ++iter) {
       
         // There's some funky iterator stuff, here I got in trouble with.
         //

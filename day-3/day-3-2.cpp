@@ -18,7 +18,7 @@ struct Multi {
 
     Multi(string multiStr) {
         regex digitsRegex("(\\d{1,3})");
-        std::sregex_iterator i = sregex_iterator(multiStr.begin(), multiStr.end(), digitsRegex);
+        sregex_iterator i = sregex_iterator(multiStr.cbegin(), multiStr.cend(), digitsRegex);
         left = stoi((*i).str() );
         right = stoi((*++i).str());
     }
@@ -43,7 +43,7 @@ vector<Multi> extractMultis(const string text) {
     bool recordOn = true;
     vector<Multi> returnVector;
 
-    for (std::sregex_iterator i = sregex_iterator(text.begin(), text.end(), multiRegex); i != sregex_iterator(); ++i) {
+    for (std::sregex_iterator i = sregex_iterator(text.cbegin(), text.cend(), multiRegex); i != sregex_iterator(); ++i) {
         smatch instruction = *i;
 
         if (instruction.str() == "don't()") {

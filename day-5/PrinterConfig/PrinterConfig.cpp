@@ -5,7 +5,7 @@ using namespace std;
 // public
 
 Page PrinterConfig::lookupPage(const int i) {
-    Page p = *(find_if(this->pageConfig.begin(), this->pageConfig.end(), [i](const Page p) {return p.getPageNumber() == i; }));
+    Page p = *(find_if(this->pageConfig.cbegin(), this->pageConfig.cend(), [i](const Page p) {return p.getPageNumber() == i; }));
     return p;
 }
 

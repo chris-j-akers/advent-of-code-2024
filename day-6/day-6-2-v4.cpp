@@ -150,7 +150,7 @@ struct Guard {
 
             if (newPosition.objectAt(map) == '#') {
                 Obstruction ob = Obstruction(this->position);
-                if (find(this->obstructionList.begin(), this->obstructionList.end(), ob) != this->obstructionList.end()) {
+                if (find(this->obstructionList.cbegin(), this->obstructionList.cend(), ob) != this->obstructionList.cend()) {
                     return true;
                 } else {
                     this->obstructionList.insert(Obstruction(this->position));

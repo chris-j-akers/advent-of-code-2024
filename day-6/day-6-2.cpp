@@ -27,7 +27,7 @@ struct Coords {
         return retval;
     }
 
-    bool operator==(const Coords &c) {
+    bool operator==(const Coords &c) const {
         if (this->x == c.x && this->y == c.y) {
             return true;
         } else {
@@ -50,7 +50,7 @@ struct Obstruction {
     Obstruction() {}
     Obstruction(Coords coords, Direction direction) : coords(coords), direction(direction) {}
 
-    bool operator==(const Obstruction &de) {
+    bool operator==(const Obstruction &de) const {
         if (this->coords == de.coords && this->direction == de.direction) {
             return true;
         } else {
@@ -138,7 +138,7 @@ struct Guard {
             if (newPosition.objectAt(map) == '#') {
                 // Has this obstruction already been encountered?
                 Obstruction ob(newPosition, this->direction);
-                if (find(obstructionList.begin(), obstructionList.end(), ob) != obstructionList.end()) {
+                if (find(obstructionList.cbegin(), obstructionList.cend(), ob) != obstructionList.cend()) {
                     return true;
                 }
 

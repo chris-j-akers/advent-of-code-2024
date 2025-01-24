@@ -25,13 +25,13 @@ struct Coords {
         return os.str();
     }
 
-    bool operator==(const Coords c) {
+    bool operator==(const Coords c) const {
         return this->x==c.x && this->y==c.y;
     }
 };
 
 struct Region {
-    char id;
+    const char id;
     int area;
     int perimeter;
     long price;
@@ -156,7 +156,7 @@ public:
 
 int main() {
     Garden g;
-    g.loadPlots("./input.txt");
+    g.loadPlots("./example.txt");
     // cout << g.toString() << endl;
     vector<Region> regions = g.getRegionData();
     long totalPrice = 0;
