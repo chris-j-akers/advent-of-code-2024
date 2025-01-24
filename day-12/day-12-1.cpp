@@ -28,25 +28,25 @@ struct Coords {
     bool operator==(const Coords c) {
         return this->x==c.x && this->y==c.y;
     }
-
 };
 
 struct Region {
     char id;
     int area;
     int perimeter;
+    long price;
 
-    Region(const char id) : id(id), area(0), perimeter(0) {}
-
-    bool operator==(const char rId) const {
-        return this->id == rId;
-    }
+    Region(const char id) : id(id), area(0), perimeter(0), price(0.0) {}
 
     string toString() const {
         ostringstream os;
-        os << "[id: " << this->id << ". area: " << this->area << ", perimeter: " << this->perimeter;
+        os << "[id: " << this->id << ". area: " << this->area << ", perimeter: " << this->perimeter << ", price: " << price;
         return os.str();
     }
+
+    bool operator==(const char rId) const {
+        return this->id == rId;
+    }    
 };
 
 class Garden {
@@ -59,6 +59,42 @@ class Garden {
             return true;
         else
             return false;
+    }
+
+    void getRegionData(const Coords c, Region& r, vector<Coords>& plotsVisited) const {
+        if (!this->withinBounds(c)) {
+            r.perimeter++;            
+            return;
+        }        
+
+        if (find(plotsVisited.begin(), plotsVisited.end(), c) != plotsVisited.end()) {
+            // Bit of a hack, but we need to make sure that the plot we've already
+            // visited is of a different plotId because, then, the last plot would
+            // have been a perimeter.
+            if (this->plots[c.y][c.x] != r.id) {
+                r.perimeter++;
+            }
+            return;
+        }
+
+        if (this->plots[c.y][c.x] == r.id) {
+            // If we don't do this, the thing goes on forever revisiting
+            // old plots.
+            plotsVisited.push_back(Coords(c.x,c.y));
+            r.area++;
+            // North
+            getRegionData(Coords(c.x, c.y-1), r, plotsVisited);
+            // South
+            getRegionData(Coords(c.x, c.y+1), r, plotsVisited);
+            // East
+            getRegionData(Coords(c.x+1, c.y), r, plotsVisited);
+            // West
+            getRegionData(Coords(c.x-1, c.y), r, plotsVisited);
+        }
+        else {
+            r.perimeter++;
+            return;
+        }
     }    
 
 public:
@@ -99,36 +135,7 @@ public:
         }
         return os.str(); 
     }
-    
-    void getRegionData(const Coords c, Region& r, vector<Coords>& plotsVisited) const {
-        if (!this->withinBounds(c)) {
-            return;
-        }        
-
-        if (find(plotsVisited.begin(), plotsVisited.end(), c) != plotsVisited.end()) {
-            return;
-        }
-
-        if (this->plots[c.y][c.x] == r.id) {
-            // If we don't do this, the thing goes on forever revisiting
-            // old plots.
-            plotsVisited.push_back(Coords(c.x,c.y));
-            r.area++;
-            // North
-            getRegionData(Coords(c.x, c.y-1), r, plotsVisited);
-            // South
-            getRegionData(Coords(c.x, c.y+1), r, plotsVisited);
-            // East
-            getRegionData(Coords(c.x+1, c.y), r, plotsVisited);
-            // West
-            getRegionData(Coords(c.x-1, c.y), r, plotsVisited);
-        }
-        else {
-            // So the previous x,y was a perimeter?
-            return;
-        }
-    }
-    
+       
     vector<Region> getRegionData() {
         vector<Region> retVal;
         vector<Coords> visitedPlots;
@@ -138,7 +145,9 @@ public:
                 if (find(visitedPlots.begin(), visitedPlots.end(), startCoords) == visitedPlots.end()) {
                     Region r(this->plots[row][col]);
                     this->getRegionData(startCoords,r, visitedPlots);
+                    r.price = r.area*r.perimeter;
                     retVal.push_back(r);
+                    // visitedPlots.clear();
                 }
             }
         }
@@ -148,10 +157,13 @@ public:
 
 int main() {
     Garden g;
-    g.loadPlots("./example.txt");
+    g.loadPlots("./input.txt");
     cout << g.toString() << endl;
     vector<Region> regions = g.getRegionData();
+    long totalPrice = 0;
     for (auto r : regions) {
         cout << r.toString() << endl;
+        totalPrice += r.price;
     }
+    cout << "\n---\n" << "Total price: " << totalPrice << endl;
 }
