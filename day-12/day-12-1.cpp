@@ -147,7 +147,6 @@ public:
                     this->getRegionData(startCoords,r, visitedPlots);
                     r.price = r.area*r.perimeter;
                     retVal.push_back(r);
-                    // visitedPlots.clear();
                 }
             }
         }
