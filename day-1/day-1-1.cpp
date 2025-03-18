@@ -7,12 +7,9 @@
 
 using namespace std; 
 
-const string INPUT_FILE="./input.txt";
-
 void load_lists(const string inputFilePath, list<int> &list1, list<int> &list2) {
     ifstream inputFile(inputFilePath);
     string line; 
-    size_t spacePos = string::npos;
 
     while (std::getline(inputFile, line)) {
         size_t splitPos = line.find(" ");
@@ -26,11 +23,11 @@ void load_lists(const string inputFilePath, list<int> &list1, list<int> &list2) 
 
 long total_distance(const list<int> &list1, const list<int> &list2) {
     int difference = 0;
-    auto list1Iterator = list1.begin();
-    auto list2Iterator = list2.begin();
+    auto list1Iterator = list1.cbegin();
+    auto list2Iterator = list2.cbegin();
     int count = 0;
 
-    while (list1Iterator != list1.end() && list2Iterator != list2.end()) {
+    while (list1Iterator != list1.cend() && list2Iterator != list2.cend()) {
         difference += abs(*list2Iterator - *list1Iterator);
         list1Iterator++;
         list2Iterator++;
@@ -41,11 +38,11 @@ long total_distance(const list<int> &list1, const list<int> &list2) {
 }
 
 int main() {
-    std::list<int> list1;
-    std::list<int> list2;
+    list<int> list1;
+    list<int> list2;
 
     // Loads and sorts the lists
-    load_lists(INPUT_FILE, list1, list2);
+    load_lists("./input.txt", list1, list2);
     long distance = total_distance(list1, list2);
     cout << "Total distance is: " << distance << endl;
 }

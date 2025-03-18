@@ -17,19 +17,19 @@ struct Coords {
     Coords() {}
     Coords(const int x, const int y) : x(x), y(y) {}
 
-    Coords diff(Coords c) {
+    Coords diff(const Coords c) const {
         return Coords(this->x-c.x, this->y-c.y);
     }
 
-    Coords operator-(Coords c) {
+    Coords operator-(const Coords c) const {
         return Coords(this->x-c.x, this->y-c.y);
     }
 
-    Coords operator+(Coords c) {
+    Coords operator+(const Coords c) const {
         return Coords(this->x+(c.x), this->y+(c.y));
     }
 
-    bool operator==(Coords c) {
+    bool operator==(const Coords c) const {
         return (this->x == c.x) && (this->y == c.y);
     }        
 
@@ -92,7 +92,7 @@ public:
     }
 
     void upsertAntiNodes(Coords an) {
-        if (find(this->antiNodes.begin(), this->antiNodes.end(), an) == this->antiNodes.end()) {
+        if (find(this->antiNodes.cbegin(), this->antiNodes.cend(), an) == this->antiNodes.cend()) {
             this->antiNodes.push_back(an);
             this->map[an.y][an.x] = '#';
         }

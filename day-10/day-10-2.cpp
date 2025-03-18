@@ -99,7 +99,7 @@ public:
         }
 
         if (reqVal == 9 && this->map[y][x].val == 9) {
-            if (find(endPositions.begin(), endPositions.end(), this->map[y][x]) == endPositions.end()) {
+            if (find(endPositions.cbegin(), endPositions.cend(), this->map[y][x]) == endPositions.end()) {
                 endPositions.push_back(this->map[y][x]);
             }
             return 1;

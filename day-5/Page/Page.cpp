@@ -11,14 +11,14 @@ int Page::getPageNumber() const {
 }
 
 bool Page::isAfter(int pageNumber) const {
-    if (find_if(this->before.begin(), this->before.end(), [pageNumber](const Page& page) { return page.getPageNumber() == pageNumber; }) != this->before.end()) {
+    if (find_if(this->before.cbegin(), this->before.cend(), [pageNumber](const Page& page) { return page.getPageNumber() == pageNumber; }) != this->before.cend()) {
         return true;
     }
     return false;
 }
 
 bool Page::isBefore(int pageNumber) const {
-    if (find_if(this->after.begin(), this->after.end(), [pageNumber](const Page& page) { return page.getPageNumber() == pageNumber; }) != this->after.end()) {
+    if (find_if(this->after.cbegin(), this->after.cend(), [pageNumber](const Page& page) { return page.getPageNumber() == pageNumber; }) != this->after.cend()) {
         return true;
     }
     return false;
